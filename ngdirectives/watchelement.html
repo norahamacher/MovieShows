@@ -1,0 +1,31 @@
+
+<div class="col-sm-2 text-right">
+  <img class="poster img-responsive" ng-src="{{item.img}}" alt="{{item.title}} - No image available"></img>
+</div>
+<div class="col-sm-4 text-left watchcontent">
+  <h4> <a href="{{item.url}}" target="_blank"> {{item.title}} </a></h4>
+  <p> {{item.review}} </p>
+   My Rating: {{item.stars}}/5 stars
+</div>
+
+<div class="col-sm-3 imdbdata">
+<h3></h3>
+  <ul>
+      <li> Year: {{item.year}} </li>
+      <li> Genre: {{item.genre}} </li>
+      <li> IMDB Rating: {{item.imdbrating}} based on {{item.imdbVotes}} votes </li>
+  </ul>
+</div>
+
+<div class="col-sm-3">
+ <h3></h3>
+  <p> {{item.plot}} </p>
+</div>
+         <!--$scope.shows[index].year = response.data.Year;
+          $scope.shows[index].imdbID = response.data.imdbID;
+          $scope.shows[index].url = "http://www.imdb.com/title/" + response.data.imdbID + "/";
+          $scope.shows[index].img = ""+response.data.Poster;
+          $scope.shows[index].imdbrating = response.data.imdbRating;
+          $scope.shows[index].imdbVotes = response.data.imdbVotes;
+          $scope.shows[index].plot = response.data.Plot;
+          $scope.shows[index].genre = reponse.data.Genre;-->
