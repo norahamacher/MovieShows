@@ -1,17 +1,26 @@
  /* Remove the navbar's default margin-bottom and rounded borders */
     .navbar {
-      margin-bottom: 0;
       border-radius: 0;
     }
 
+    body { padding-top: 70px; }
+
+
+   .sorter {
+    color: white;
+    margin-top:15px;
+    padding-right:5px;
+   }
 
     /* Set height of the grid so .sidenav can be 100% (adjust as needed) */
     .row.content {height: 450px}
-
+    .dropdown-menu,
+    .dropdown-toggle {
+      width: 145px;
+    }
     /* Set gray background color and 100% height */
     .sidenav {
-      padding-top: 20px;
-      background-color: #f1f1f1;
+
       height: 100%;
     }
 
@@ -37,4 +46,13 @@
         padding: 15px;
       }
       .row.content {height:auto;}
+    }
+
+    @media screen and (min-width: 768px) {
+
+       .searchboxfront {
+          position: fixed;
+          z-index: 1000;
+          margin-right: 20px;
+        }
     }

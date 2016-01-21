@@ -14,7 +14,7 @@
 
 
 <body ng-app="myApp" ng-controller="ctrl">
-<nav class="navbar navbar-inverse">
+<nav class="navbar navbar-inverse navbar-fixed-top">
   <div class="container-fluid">
 
     <div class="navbar-header">
@@ -30,17 +30,21 @@
         <li ng-class="{'active':active === 'home'}" ng-click="active = 'home'"><a href="#">Home</a></li>
         <li ng-class="{'active':active === 'movs'}" ng-click="active = 'movs'"><a href="#">Movies</a></li>
         <li ng-class="{'active':active === 'shows'}" ng-click="active = 'shows'"><a href="#">Shows</a></li>
-
- <!--      </ul>
-      <ul class="nav navbar-nav navbar-right">
+        <li ng-class="{'active':active === 'recom'}" ng-click="active = 'recom'"><a href="#">Recommendations</a></li>
+      </ul>
+    <!--   <ul class="nav navbar-nav navbar-right">
         <li>
          <button type="button" class="btn btn-default" ng-click="updateMovies()">Update</button>
         </li>
-      </ul>
-      <!--
-    <ul class="nav navbar-nav navbar-right">
-        <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
       </ul>-->
+
+     <ul class="nav navbar-nav navbar-right" ng-show="active === 'movs' || active ==='shows'">
+        <li> <p class="sorter" >Sort by</p> </li>
+        <li ng-class="{'active':sortby === 'title'}" ng-click="sortby='title'"> <a href="#">A-Z</a></li>
+        <li ng-class="{'active':sortby === 'genre'}" ng-click="sortby='genre'"> <a href="#">Genre</a></li>
+        <li ng-class="{'active':sortby === 'imdbrating'}" ng-click="sortby='-imdbrating'"> <a href="#">IMDB Rating</a></li>
+        <li ng-class="{'active':sortby === 'stars'}" ng-click="sortby='-stars'"> <a href="#">My stars</a></li>
+      </ul>
     </div>
   </div>
 </nav>
@@ -54,33 +58,90 @@
       <p>On this site you can browse which movies and shows I have watched with my opinion on them. You can provide your own opinion as well, and suggest other movies and shows to me.
         This site uses bootstrap and AngularJS. The Google Apps Script Execution API to gain access to a Google spreadsheet with all the information. The omdb API is used to draw information about the movies and shows, including images.
         Have fun browsing the site! </p>
+        <hr>
+        <h4>Changelog:</h4>
+        <ul>
+          <li> <h5>21/01/15</h5> Recommendation section looks nicer and also draws IMDB Data. Will start to record progress from now on using github version. </li>
+          <li> <h5>20/01/15</h5> recommendations can now be made, existing recommendations can be increased via button click. Duplicate recommendations get merged.</li>
+          <li> added recommendation page where previous recommendations are listed. </li>
+          <li> Hides Sort and filter options on the welcome page, only visible for movies and shows page </li>
+          <li> <h5>18/01/15:</h5> Added multiple search options which can be combined </li>
+          <li>  Search box fixed position and always visible upon scrolling </li>
+           <li>  Sort buttons added, can be sorted by title or by genre.
+             <li> <h5>17/01/15:</h5> Search box added which searches through all fields
+          <li>  Information can be written back to the google sheet (Using Google Apps Script). If the imdb ID is not present in the sheet, it is now added. If the ID is present it is used to query information from OMDB API, else the title is used </li>
+              <li> <h5>16/01/15: </h5>First protoype, movies and shows are read from Google sheet and displayed in a list. </li>
+          </ul>
+            <hr>
+            <h4>Todos</h4>
+            <ul>
+              <li> Add more movies </li>
+            </ul>
       <hr>
     </div>
 
     <div class="col-sm-10 text-left movies" ng-show="active==='movs'">
-      <div class="col-sm-12 watchobject well" ng-repeat="item in googleJSON | filter:{type:'movie'} | filter: search">
+
+      <div class="col-sm-12 watchobject well" ng-repeat="item in googleJSON | filter:{type:'movie'} | filter: search  | filter: genreSearch |  orderBy:sortby" ng-if="item.imdbrating >= imdbRatingSrch" ng-if="item.stars >= myRatingSrch">
           <watchelement></watchelement>
       </div>
     </div>
 
     <div class="col-sm-10 text-left shows" ng-show="active==='shows'">
-      <div class="col-sm-12 watchobject well" ng-repeat="item in googleJSON | filter:{type:'show'} | filter: search">
+
+      <div class="col-sm-12 watchobject well" ng-repeat="item in googleJSON | filter:{type:'show'} | filter: search | filter: genreSearch | orderBy:sortby " ng-if="item.imdbrating >= imdbRatingSrch" ng-if="item.stars >= myRatingSrch">
         <watchelement></watchelement>
       </div>
     </div>
 
-    <div class="col-sm-2 sidenav">
-      <div class="form-group well">
+    <div class="col-sm-12 col-md-6 text-left recommendations" ng-show="active==='recom'">
+      <h3> Do you want me to watch something? </h3>
+      <p>
+        I glady accept and film or show tipps you might have. Here are all the recommendations I have gotten so far, if you want to add one, please feel free! </p>
+
+          <div class="list-group">
+            <a href="{{recom.url}}" target="_blank" class="list-group-item" ng-repeat="recom in recommendations">
+              <span class="badge pull-left col-md-1 col-xs-1">{{recom.amount}}</span> <h5 class="col-xs-11 col-md-5 list-group-item-heading"> {{recom.recom}} </h5>
+              <div class="col-xs-1 hidden-md hidden-lg"></div>
+              <p class="col-xs-6 col-md-3 list-group-item-text">IMDB Rating: {{recom.imdbRating}}</p>
+              <button class="btn btn-default btn-sm" ng-click="increaseRecom(recom.recom)"> Agree! Watch this! </button>
+            </a>
+          </div>
+
+
+          <div class="form-group recommendation">
+            <label for="newrecom">My recommendation: </label>
+              <input type="text" class="form-control" id="newrecom" ng-model="recommendation">
+            <button class="btn btn-default" ng-click="sendRecommendation()">Submit</button>
+          </div>
+    </div>
+
+    <div class="col-sm-2 sidenav " ng-show="active === 'movs' || active ==='shows'">
+      <div class="form-group well searchboxfront">
         <label for="srch">Search:</label>
         <input type="text" ng-model="search" class="form-control" id="srch">
 
+        <label for:"genre">Genre: </label>
+        <div class="dropdown" id="genre">
+          <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">{{genreSearch}}
+          <span class="caret"></span></button>
+            <ul class="dropdown-menu" >
+              <li ng-repeat="genre in genres"><a ng-click="setGenreSearch(genre)" href="#">{{genre}}</a></li>
+            </ul>
+        </div>
+
+        <label for:"imdbRating">IMDB rating at least: </label>
+        <input type="text" ng-model="imdbRatingSrch" class="form-control text-right" id="imdbRating">
+
+        <label for:"myRating">My rating at least: </label>
+        <input type="text" ng-model="myRatingSrch" class="form-control text-right" id="myRating">
       </div>
     </div>
 
   </section>
 </div>
 <footer class="container-fluid text-center">
-  <p>Footer Text</p>
+  <p>All images taken by AJAX call from OMDB Api.</p>
 </footer>
 
 <script src="js/gviz-api.js"></script>
