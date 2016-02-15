@@ -3,6 +3,8 @@
 //key: 1sKshjbmFNMzzyXiDPUmksJKfY7Uo3AlMQ09p7_46XmE
 //1sKshjbmFNMzzyXiDPUmksJKfY7Uo3AlMQ09p7_46XmE
 //https://docs.google.com/spreadsheets/d/1sKshjbmFNMzzyXiDPUmksJKfY7Uo3AlMQ09p7_46XmE/edit?usp=sharing
+
+//tmdb; 8c0ea7d171955da0a51e3376faac2548
 (function(){
 
 
@@ -11,6 +13,7 @@
         var show = document.getElementById(toShow);
         show.style.display = "";
     }
+
 
    var app = angular.module('myApp', []);
    app.controller('ctrl', ['$scope','$http', function($scope, $http){
@@ -33,9 +36,17 @@
 		//the recommendations drawn from the Google sheet (if more get added, this gets updated as well)
 		$scope.recommendations = [];
 
+		$scope.baseurl = "";
+		var apiKey_tmdb = "8c0ea7d171955da0a51e3376faac2548";
+
+
+
+
 	  var onError = function(response){
 	    console.log("error: " + response);
 	  };
+
+
 
 	  $scope.increaseRecom = function(recom) {
 	  	console.log(recom);
@@ -101,7 +112,7 @@
 	  	}, onError);
 
 	    //recommendations
-	    urlToGoogleSheetCells = "https://spreadsheets.google.com/feeds/" +
+	/*    urlToGoogleSheetCells = "https://spreadsheets.google.com/feeds/" +
 							"list/" +
 							"1sKshjbmFNMzzyXiDPUmksJKfY7Uo3AlMQ09p7_46XmE/" +
 							"3/public/full?alt=json";
@@ -112,7 +123,7 @@
 	    		$scope.recommendations.push(obj);
 	    		$scope.getObjectDataRecommendation(obj.recom,i);
 	    	}
-	    }, onError);
+	    }, onError);*/
 	  };
 
 	  $scope.getObjectDataRecommendation = function(title, index) {
@@ -126,6 +137,8 @@
 	  	}, onError);
 	  }
 	  //for each movie or show, draw some imdb data
+
+
 	  $scope.getObjectDataInit = function(title,index) {
 	  	var imdbURL = "http://www.omdbapi.com/?y=&plot=short&r=json";
 	  	imdbURL += "&t="+title;
@@ -138,7 +151,7 @@
 			$scope.googleJSON[index].year = response.data.Year;
 			$scope.googleJSON[index].imdbID = response.data.imdbID;
 			$scope.googleJSON[index].url = "http://www.imdb.com/title/" + response.data.imdbID + "/";
-			$scope.googleJSON[index].img = ""+response.data.Poster;
+		//	$scope.googleJSON[index].img = ""+response.data.Poster;
 			$scope.googleJSON[index].imdbrating = response.data.imdbRating;
 			$scope.googleJSON[index].imdbVotes = response.data.imdbVotes;
 			$scope.googleJSON[index].plot = response.data.Plot;
@@ -147,10 +160,38 @@
 			$scope.updateTable(response.data.imdbID, title, "");
 			$scope.checkGenres(response.data.Genre);
 
-			//$scope.newIDs.push({imdbID: response.data.imdbID, title:title});
+			$scope.newIDs.push({imdbID: response.data.imdbID, title:title});
   		}, onError);
 
+	    $scope.getImage(response.data.imdbID, index);
 	  }
+
+	  $scope.getImage = function(imdbID,index){
+	  	//tt0266543?external_source=imdb_id&api_key=8c0ea7d171955da0a51e3376faac2548
+
+	  	var url = "https://api.themoviedb.org/3/find/" + imdbID +"?";
+	  	url += "external_source=imdb_id";
+	  	url+="&api_key=" + apiKey_tmdb;
+
+	  	$http.get(url)
+	    .then(function successCallback(response) {
+
+	    	if(response.data.movie_results.length > 0) {
+	    		$scope.googleJSON[index].img = $scope.baseurl + "w154" +  response.data.movie_results[0].poster_path;
+	    	}else {
+	    		$scope.googleJSON[index].img = $scope.baseurl + "w154" +  response.data.tv_results[0].poster_path;
+	    	}
+
+    // this callback will be called asynchronously
+    // when the response is available
+
+  		}, onError);
+	  }
+
+
+
+
+
 
 	  $scope.checkGenres = function(str) {
         if(str!==undefined){
@@ -177,6 +218,7 @@
         }
         });
 	  }
+
 	   $scope.getObjectDataByID = function(id,index) {
 	  	var imdbURL = "http://www.omdbapi.com/?y=&plot=short&r=json";
 	  	imdbURL += "&i="+id;
@@ -188,7 +230,7 @@
     // when the response is available
 			$scope.googleJSON[index].year = response.data.Year;
 			$scope.googleJSON[index].url = "http://www.imdb.com/title/" + response.data.imdbID + "/";
-			$scope.googleJSON[index].img = ""+response.data.Poster;
+			//$scope.googleJSON[index].img = ""+response.data.Poster;
 			$scope.googleJSON[index].imdbrating = response.data.imdbRating;
 			$scope.googleJSON[index].imdbVotes = response.data.imdbVotes;
 			$scope.googleJSON[index].plot = response.data.Plot;
@@ -196,9 +238,26 @@
 			$scope.checkGenres(response.data.Genre);
 
   		}, onError);
-
+	    $scope.getImage(id, index);
 	  }
-	  $scope.getData();
+	  //https://api.themoviedb.org/3/find/tt0266543?external_source=imdb_id&api_key=8c0ea7d171955da0a51e3376faac2548
+
+$scope.getBaseUrl = function() {
+	    	//8c0ea7d171955da0a51e3376faac2548
+	    	var url = "http://api.themoviedb.org/3/configuration?api_key=";
+	    	url += apiKey_tmdb;
+		    $http.get(url)
+		    .then(function successCallback(response){
+		    	 	console.log(response);
+		  		$scope.baseurl = response.data.images.base_url;
+		  		$scope.getData();
+		  	}, onError);
+
+
+    	}
+
+
+		$scope.getBaseUrl();
   }]); //app controller
 
   app.directive('watchelement', function() {
