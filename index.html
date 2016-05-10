@@ -61,6 +61,10 @@
         <hr>
         <h4>Changelog:</h4>
         <ul>
+          <li> <h5> 15/02/16 </h5></li>
+            <ul>
+              <li>Images are now taken from themoviedb.org API instead of imdb due to display issues </li>
+          </ul>
           <li> <h5>21/01/15</h5> </li>
             <ul>
               <li> Recommendation section looks nicer and also draws IMDB Data. </li>
@@ -117,12 +121,15 @@
         I glady accept and film or show tipps you might have. Here are all the recommendations I have gotten so far, if you want to add one, please feel free! </p>
 
           <div class="list-group">
-            <a href="{{recom.url}}" target="_blank" class="list-group-item" ng-repeat="recom in recommendations">
-              <span class="badge pull-left col-md-1 col-xs-1">{{recom.amount}}</span> <h5 class="col-xs-11 col-md-5 list-group-item-heading"> {{recom.recom}} </h5>
-              <div class="col-xs-1 hidden-md hidden-lg"></div>
-              <p class="col-xs-6 col-md-3 list-group-item-text">IMDB Rating: {{recom.imdbRating}}</p>
-              <button class="btn btn-default btn-sm" ng-click="increaseRecom(recom.recom)"> Agree! Watch this! </button>
-            </a>
+            <div class="list-group-item" ng-repeat="recom in recommendations">
+              <span class="badge pull-left col-md-1 col-xs-1">{{recom.amount}}</span>
+              <h5 class="col-xs-11 col-md-5 list-group-item-heading toppad">
+              <a href="{{recom.url}}" target="_blank toppad"> {{recom.recom}} </a></h5>
+              <div class="col-xs-1 hidden-md hidden-lg toppad"></div>
+              <p class="col-xs-6 col-md-3 list-group-item-text toppad">IMDB Rating: {{recom.imdbRating}}</p>
+                <button class="btn btn-default btn-sm agreebtn" ng-click="increaseRecom(recom.recom)"> Agree! Watch this! </button>
+            </div>
+
           </div>
 
 
@@ -158,7 +165,7 @@
   </section>
 </div>
 <footer class="container-fluid text-center">
-  <p>All images taken by AJAX call from OMDB Api.</p>
+  <p>All images taken by API Call from themoviedb.org</p>
 </footer>
 
 <script src="js/gviz-api.js"></script>

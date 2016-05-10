@@ -112,18 +112,19 @@
 	  	}, onError);
 
 	    //recommendations
-	/*    urlToGoogleSheetCells = "https://spreadsheets.google.com/feeds/" +
+	    urlToGoogleSheetCells = "https://spreadsheets.google.com/feeds/" +
 							"list/" +
 							"1sKshjbmFNMzzyXiDPUmksJKfY7Uo3AlMQ09p7_46XmE/" +
-							"3/public/full?alt=json";
+							"2/public/full?alt=json";
 	    $http.get(urlToGoogleSheetCells)
 	    .then(function successCallback(response) {
 	    	for(var i = 0; i < response.data.feed.entry.length; i++) {
-	    		var obj = { recom : response.data.feed.entry[i].gsx$recommendations.$t, amount: response.data.feed.entry[i].gsx$amount.$t }
+	    		console.log(response);
+	    		var obj = { recom : response.data.feed.entry[i].gsx$recommendation.$t, amount: response.data.feed.entry[i].gsx$amount.$t }
 	    		$scope.recommendations.push(obj);
 	    		$scope.getObjectDataRecommendation(obj.recom,i);
 	    	}
-	    }, onError);*/
+	    }, onError);
 	  };
 
 	  $scope.getObjectDataRecommendation = function(title, index) {
@@ -163,7 +164,7 @@
 			$scope.newIDs.push({imdbID: response.data.imdbID, title:title});
   		}, onError);
 
-	    $scope.getImage(response.data.imdbID, index);
+	    $scope.getImage($scope.googleJSON[index].imdbID, index);
 	  }
 
 	  $scope.getImage = function(imdbID,index){
@@ -178,7 +179,7 @@
 
 	    	if(response.data.movie_results.length > 0) {
 	    		$scope.googleJSON[index].img = $scope.baseurl + "w154" +  response.data.movie_results[0].poster_path;
-	    	}else {
+	    	}else if(response.data.tv_results.length > 0) {
 	    		$scope.googleJSON[index].img = $scope.baseurl + "w154" +  response.data.tv_results[0].poster_path;
 	    	}
 
@@ -248,7 +249,7 @@ $scope.getBaseUrl = function() {
 	    	url += apiKey_tmdb;
 		    $http.get(url)
 		    .then(function successCallback(response){
-		    	 	console.log(response);
+
 		  		$scope.baseurl = response.data.images.base_url;
 		  		$scope.getData();
 		  	}, onError);
